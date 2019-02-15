@@ -1,43 +1,34 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const graphHttp = require('express-graphql');
-const {buildSchema} = require('graphql');    //es6 object destructuring: stores values of props to equally named vars
+const mongoose = require('mongoose');
+
+const graphQLSchema = require('./gql/schema/index');
+const graphQLResolvers = require('./gql/resolvers/index');
 
 const app = express();
 
 app.use(bodyParser.json());
 
-//----------- GraphQL -----------------
-//String = list of strings, ! = not null
-//Query named as 'objectname' EG. events
-//Mutation named as 'actionObjectname' EG. createEvent()
-//Resolver named same as above, they must match! EG. events
-//note: args can be passed to both queries and mutations
+
+
 app.use('/graphql', graphHttp({
-    schema: buildSchema(`
-        type RootQuery {
-            events: [String!]!
-        }
-        
-        type RootMutation {
-            createEvent(name: String): String
-        }
-        
-        schema {
-            query: RootQuery
-            mutation: RootMutation
-        }
-    `),
-    rootValue: {
-        events: () => {
-            return ['mtbing', 'poker', 'gaming'];
-        },
-        createEvent: (args) => {
-            const eventName = args.name;
-            return eventName;
-        }
-    },
+    schema: graphQLSchema,
+    rootValue: graphQLResolvers,
     graphiql: true
 }));
 
-app.listen(3000);
+mongoose.connect(
+    `mongodb://${process.env.MONGO_ATLAS_USER}:${process.env.MONGO_ATLAS_PW}@scoopycluster-shard-00-00-qdudo.mongodb.net:27017,scoopycluster-shard-00-01-qdudo.mongodb.net:27017,scoopycluster-shard-00-02-qdudo.mongodb.net:27017/${process.env.MONGO_ATLAS_DB}?ssl=true&replicaSet=scoopycluster-shard-0&authSource=admin&retryWrites=true`,
+    {
+        useNewUrlParser: true
+    }
+)
+    .then(() => {
+        app.listen(3000);
+    })
+    .catch(err => {
+        console.log(err);
+    });
+
+mongoose.Promise = global.Promise;
