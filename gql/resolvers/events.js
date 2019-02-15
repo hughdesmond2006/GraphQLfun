@@ -1,4 +1,5 @@
 const Event = require('../../models/event');
+const User = require('../../models/user');
 const {transformEvent} = require('./merge');
 
 module.exports = {              //these are resolvers...
@@ -14,13 +15,16 @@ module.exports = {              //these are resolvers...
                 throw err;
             });
     },
-    createEvent: (args) => {
+    createEvent: (args, req) => {
+        if(!req.isAuth){
+            throw new Error('Bad Auth');
+        }
         const event = new Event({
             title: args.eventInput.title,
             description: args.eventInput.description,
             price: +args.eventInput.price,
             date: new Date(args.eventInput.date),      //this parses the date into proper object
-            creator: '5c658699f4d8d12968f25b40'       //mongoose auto converts to obj id
+            creator: req.userId       //mongoose auto converts to obj id
         });
         let createdEvent;
         return event
