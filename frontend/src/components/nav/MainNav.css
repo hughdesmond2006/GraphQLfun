@@ -24,20 +24,29 @@
     margin: 0 0 0 1.5rem;
     padding: 0;
     list-style: none;
+    align-items: center;
 }
 
 .main-nav__items li {
     margin: 0 1rem;
 }
 
-.main-nav__items a {
+.main-nav__items a,
+.main-nav__items button {
     text-decoration: none;
     color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    font: inherit;
+    background: transparent;
+    cursor: pointer;
 }
 
 .main-nav__items a:hover,
 .main-nav__items a:active,
-.main-nav__items a.active{
+.main-nav__items button:hover,
+.main-nav__items button.active{
     text-decoration: none;
     color: #aeff82;
+    margin: 0;
 }
