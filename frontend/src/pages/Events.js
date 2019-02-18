@@ -7,7 +7,8 @@ import AuthContext from '../context/auth-context';
 
 class EventsPage extends Component {
     state = {
-        creating: false
+        creating: false,
+        events: []
     };
 
     static contextType = AuthContext;
@@ -18,12 +19,20 @@ class EventsPage extends Component {
         this.priceElement = React.createRef();
         this.dateElement = React.createRef();
         this.descriptionElement = React.createRef();
+
+        this.modalConfirmHandler = this.modalConfirmHandler.bind(this);
+    }
+
+    //fetch events right after events page is mounted..
+    componentDidMount() {
+        this.fetchEvents();
     }
 
     startCreateEventHandler = () => {
         this.setState({creating: true});
     };
 
+    //add event..
     modalConfirmHandler = () => {
         this.setState({creating: false});
         console.log("this cant be null:" + this);
@@ -50,7 +59,7 @@ class EventsPage extends Component {
         const requestBody = {
             query: `
             mutation {
-                createEvent(eventInput: {title: "${title}", description:"${description}", price:"${price}", date:"${date}"}) {
+                createEvent(eventInput: {title: "${title}", description:"${description}", price:${price}, date:"${date}"}) {
                     _id
                     title
                     description
@@ -81,15 +90,11 @@ class EventsPage extends Component {
             }
             return res.json();
         }).then((resData) => {
-            console.log(resData);
-            /*if(resData.data.login.token){
-                this.context.login(
-                    resData.data.login.token,
-                    resData.data.login.userId,
-                    resData.data.login.tokenExpiration)
-            }*/
+            console.dir(resData);
+
+            this.fetchEvents();
         }).catch(err => {
-            console.log(err);
+            console.dir(err);
         });
 
 
@@ -99,7 +104,53 @@ class EventsPage extends Component {
         this.setState({creating: false});
     };
 
+    fetchEvents(){
+        const requestBody = {
+            query: `
+                query {
+                    events {
+                        _id
+                        title
+                        description
+                        date
+                        price
+                        creator {
+                            _id
+                            email
+                        }
+                    }
+                }
+            `
+        };
+
+        //sends http req to browser
+        fetch('http://localhost:8000/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            if(res.status !== 200 && res.status !== 201){
+                throw new Error('failed!');
+            }
+            return res.json();
+        }).then((resData) => {
+            console.dir(resData);
+
+            const events = resData.data.events;
+            this.setState({events: events});
+        }).catch(err => {
+            console.dir(err);
+        });
+    }
+
     render(){
+        //map is good for transforming raw data into html tags
+        const eventList = this.state.events.map(event => {
+            return <li key={event._id} className={"events__list-item"}>{event.title}</li>;
+        });
+
         return (
             <React.Fragment>
                 {this.state.creating && <Backdrop/>}
@@ -129,10 +180,13 @@ class EventsPage extends Component {
                             </div>
                         </form>
                     </Modal>)}
-                <div className={'events-control'}>
-                    <p>Share your own events!</p>
-                    <button className={'btn'} onClick={this.startCreateEventHandler}>Create Event</button>
-                </div>
+                {this.context.token && (
+                    <div className={'events-control'}>
+                        <p>Share your own events!</p>
+                        <button className={'btn'} onClick={this.startCreateEventHandler}>Create Event</button>
+                    </div>
+                )}
+                <ul className={"events__list"}>{eventList}</ul>
             </React.Fragment>
         );
     }
