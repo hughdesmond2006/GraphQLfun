@@ -9,7 +9,7 @@ const mainNav = props => (
         {(context) => {
             return <header className={"main-nav"}>
                 <div className={"main-nav__logo"}>
-                    <h1>Easy Event {console.log("MAINNAVCXT: " + JSON.stringify(context))}</h1>
+                    <h1>Easy Event</h1>
                 </div>
                 <nav className={"main-nav__items"}>
                     <ul>

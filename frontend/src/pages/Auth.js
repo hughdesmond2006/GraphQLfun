@@ -10,10 +10,11 @@ class AuthPage extends Component {
 
     static contextType = AuthContext;
 
-    constructor(props) {
+    constructor(props, context) {
         super(props);
         this.emailElement = React.createRef();
         this.passwordElement = React.createRef();
+        this.cxt = context;
     }
 
     switchModeHandler = () => {
@@ -67,13 +68,16 @@ class AuthPage extends Component {
             if(res.status !== 200 && res.status !== 201){
                 throw new Error('failed!');
             }
+
             return res.json();
-        }).then((resData) => {
+        }).then(resData => {
             if(resData.data.login.token){
                 this.context.login(
                     resData.data.login.token,
                     resData.data.login.userId,
-                    resData.data.login.tokenExpiration)
+                    resData.data.login.tokenExpiration);
+
+                console.dir(this);
             }
         }).catch(err => {
             console.log(err);
