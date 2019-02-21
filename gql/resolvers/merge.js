@@ -13,10 +13,15 @@ const userLoader = new DataLoader((userIds) => {
     return User.find({_id: {$in: userIds}});     //returns a promise which dataloader needs
 });
 
-//trying async await...
+//trying async await..
+//The order the events are returned is important for dataloader to know which data matches which ID
 const events = async (eventIds) => {
     try {
         const events = await Event.find({_id: {$in: eventIds}});
+        events.sort((a,b) => {
+            return eventIds.indexOf(a._id.toString()) - eventIds.indexOf(b._id.toString())
+        });
+
         return events.map(event => {
             return transformEvent(event);
         });
