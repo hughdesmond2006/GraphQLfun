@@ -5,7 +5,7 @@ import {BrowserRouter, Route, Redirect, Switch} from 'react-router-dom';
 import AuthPage from './pages/Auth'
 import BookingsPage from './pages/Bookings'
 import EventsPage from './pages/Events'
-import MainNav from './components/nav/MainNav';
+import MainNav from './components/Navigation/MainNav';
 import AuthContext from './context/auth-context';
 
 class App extends Component {

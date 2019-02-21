@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
+    // //auth bypass for dev...
+    // req.isAuth = true;
+    // req.userId = '5c66d3d62429013dd0dff133';
+    // return next();
+    // //--------------------
+
     const authHeader = req.get('Authorization');
     if(!authHeader){
         req.isAuth = false;
@@ -25,6 +31,6 @@ module.exports = (req, res, next) => {
         return next();
     }
     req.isAuth = true;
-    req.userId = decodedToken.userId;
+    req.userId = decodedToken.userId;    //here we extract the userId from the returned object from JWT verify
     next();
 };

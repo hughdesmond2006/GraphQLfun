@@ -8,7 +8,7 @@ module.exports = {             //these are resolvers...
             throw new Error('Bad Auth');
         }
         try {
-            const bookings = await Booking.find();
+            const bookings = await Booking.find({user: req.userId});
             return bookings.map(function(booking) {
                 return transformBooking(booking);
             });
@@ -38,7 +38,7 @@ module.exports = {             //these are resolvers...
             await Booking.deleteOne({_id: args.bookingId});
             return event;
         } catch (err) {
-            throw err;
+            throw new Error('Booking does not exist!');
         }
     },
 };

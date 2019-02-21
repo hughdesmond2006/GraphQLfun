@@ -1,6 +1,17 @@
+//dataloader combines multiple requests for a single ID into one request, for efficiency
+const DataLoader = require('dataloader');
+
 const Event = require('../../models/event');
 const User = require('../../models/user');
 const {dateToString} = require('../../helpers/date');
+
+const eventLoader = new DataLoader((eventIds) => {
+    return events(eventIds);
+});
+
+const userLoader = new DataLoader((userIds) => {
+    return User.find({_id: {$in: userIds}});     //returns a promise which dataloader needs
+});
 
 //trying async await...
 const events = async (eventIds) => {
@@ -16,20 +27,21 @@ const events = async (eventIds) => {
 
 const eventInfo = async (eventId) => {
     try {
-        const event = await Event.findById(eventId);
-        return transformEvent(event);
+        const event = await eventLoader.load(eventId.toString());
+        return event;
     } catch (e) {
         throw e;
     }
 };
 
 const userInfo = (userId) => {
-    return User.findById(userId)
+    //important to pass ID's as strings (not objectID's) to dataloader, or the internal comparison will fail
+    return userLoader.load(userId.toString())
         .then(user => {
             return {
                 ...user._doc,
                 _id: user.id,
-                createdEvents: events.bind(this, user._doc.createdEvents)
+                createdEvents: events.bind(this, user._doc.createdEvents)         //TODO get this working: () => eventLoader.loadMany(user._doc.createdEvents)
             };    //get doc but overwrite the id
         })
         .catch(err => {

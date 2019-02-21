@@ -31,7 +31,7 @@ module.exports = {              //these are resolvers...
             .save()
             .then(result => {
                 createdEvent = transformEvent(result);
-                return User.findById('5c658699f4d8d12968f25b40');
+                return User.findById(req.userId);
             })
             .then(user => {
                 if(!user){

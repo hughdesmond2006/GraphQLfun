@@ -33,7 +33,10 @@ app.use('/graphql', graphHttp({
 mongoose.connect(
     `mongodb://${process.env.MONGO_ATLAS_USER}:${process.env.MONGO_ATLAS_PW}@scoopycluster-shard-00-00-qdudo.mongodb.net:27017,scoopycluster-shard-00-01-qdudo.mongodb.net:27017,scoopycluster-shard-00-02-qdudo.mongodb.net:27017/${process.env.MONGO_ATLAS_DB}?ssl=true&replicaSet=scoopycluster-shard-0&authSource=admin&retryWrites=true`,
     {
-        useNewUrlParser: true
+        useNewUrlParser: true,
+        socketTimeoutMS: 30000,
+        keepAlive: true,
+        reconnectTries: 30000
     }
 )
     .then(() => {
