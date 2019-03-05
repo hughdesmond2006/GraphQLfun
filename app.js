@@ -9,6 +9,38 @@ const isAuth = require('./middleware/is-auth');
 
 const app = express();
 
+//-----------------------
+
+function scaleImage(width, height, maxdim) {
+    let scale = (maxdim / height < maxdim / width) ? (maxdim / height) : (maxdim / width);
+    return [scale * width, scale * height];
+}
+
+console.log(scaleImage(100, 400, 800))
+
+//----------------------
+
+
+//-----------------
+let x = 2;
+let y = 8;
+const a = function(b) {
+    return function(c) {
+        return x + y + Math.abs(b) + c;
+    }
+};
+
+y = 4;
+
+const fn = a(x);
+x = 4;
+console.log(fn(Math.random() * 10));
+//------------------------
+
+
+
+
+
 app.use(bodyParser.json());
 
 //this sets CORs so the client can communicate with the server from a different domain
